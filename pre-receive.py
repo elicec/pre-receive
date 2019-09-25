@@ -23,14 +23,17 @@ def getCommitMsg(old, new):
     return out
 
 def isAutoMsg(msg):
-    pat = re.compile(r'^(?:Merge|Rvert)')
+    #pat = re.compile(r'^(?:Merge|Revert)')
+    pat = re.compile(r'^Revert')
     return pat.match(msg)
 
 #TODO check content  in []
 def verifyCommitMsgs(msgs):
     match = None
-    pat = re.compile(r'^\[.{0,16}\]\[.*\]\[.*\]')#[test][test][test]
+    pat = re.compile(r'^\[.{0,64}\]\[.*\]\[.*\]')#[test][test][test]
     for msg in msgs:
+        msg = msg.encode('utf-8')
+        print('start check: '+msg)
         if isAutoMsg(msg):# Merge or Revert msg
             continue
         match = pat.match(msg)
@@ -51,7 +54,7 @@ def main():
     if isPushTag(branch):
         print("is a tag")
         sys.exit(0)#success exit
-    com_msg = getCommitMsg(old, new).split()
+    com_msg = getCommitMsg(old, new).split('\n')
     result = verifyCommitMsgs(com_msg)
     if result:
         print(CGREEN + 'Verify Commit Message success' + CEND)
